@@ -11,6 +11,9 @@ overrides:
   uuid@^8.3.1: 11.1.1
   ip@^1.1.8: 2.0.1
 
+patchedDependencies:
+  '@hyacine/plugin-waline-comments@0.1.0': e767a89227b454ca2227ac25c2a597c07950644c39fc5155d454b96688622db9
+
 importers:
 
   .:
@@ -71,7 +74,7 @@ importers:
         version: 0.1.0
       '@hyacine/plugin-waline-comments':
         specifier: ^0.1.0
-        version: 0.1.0(typescript@6.0.3)
+        version: 0.1.0(patch_hash=e767a89227b454ca2227ac25c2a597c07950644c39fc5155d454b96688622db9)(typescript@6.0.3)
       '@hyacine/sdk':
         specifier: ^0.1.1
         version: 0.1.1(astro@7.2.4(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.2.0)(jiti@2.7.0)(yaml@2.9.0))
@@ -6349,7 +6352,7 @@ snapshots:
       '@hyacine/contract': 0.1.1
       '@hyacine/plugin-core': 0.2.0
 
-  '@hyacine/plugin-waline-comments@0.1.0(typescript@6.0.3)':
+  '@hyacine/plugin-waline-comments@0.1.0(patch_hash=e767a89227b454ca2227ac25c2a597c07950644c39fc5155d454b96688622db9)(typescript@6.0.3)':
     dependencies:
       '@hyacine/contract': 0.1.1
       '@hyacine/plugin-core': 0.2.0
