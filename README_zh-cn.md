@@ -5,8 +5,9 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/theme-shoka-x/astro-blog-shokax)
 [![使用 EdgeOne Pages 部署](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?repository-url=https://github.com/theme-shoka-x/astro-blog-shokax)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/theme-shoka-x/astro-blog-shokax)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/theme-shoka-x/astro-blog-shokax)
 
-这是 [Hexo Theme ShokaX](https://github.com/theme-shoka-x/hexo-theme-shokaX) 在 Astro 上的重构版本，使用 Astro + Svelte 5 + UnoCSS 技术栈
+这是 [Hexo Theme ShokaX](https://github.com/theme-shoka-x/hexo-theme-shokaX) 在 Astro 上的重构版本，使用 Astro + SolidJS + UnoCSS 技术栈
 
 [<img width="1920" height="911" alt="三栏式预览" src="https://github.com/user-attachments/assets/b8ad5bbe-43a3-4c49-a32f-45ba5ba3dcd1" />](https://preview.astro.kaitaku.xyz/)
 
@@ -35,7 +36,7 @@
 
 ## 📦 安装
 
-本项目建议使用 [Bun](https://bun.sh/) 运行，不保证与 Nodejs 的兼容性
+本项目建议使用 [Node.js](https://nodejs.org/)（v22.12 及以上）与 [pnpm](https://pnpm.io/) 运行。
 
 你可以直接将本仓库 Clone 到本地（并为我们点一个 Star 😜），来开始使用。也可使用[由 Hyc 提供的交互式安装支持](https://docs.astro.kaitaku.xyz/start/guides/)
 
@@ -46,13 +47,13 @@ git clone https://github.com/theme-shoka-x/astro-blog-shokax
 
 cd astro-blog-shokax
 
-bun install
+pnpm install
 
 # 启动开发服务器
-bun run dev
+pnpm run dev
 
 # 构建生产版本
-bun run build
+pnpm run build
 ```
 
 现在，你的站点已经可用了。如果你想自定义你的站点，查看完整文档来进行下一步：[ShokaX Astro 文档](https://docs.astro.kaitaku.xyz/start/guides/)
@@ -69,7 +70,7 @@ astro-blog-shokax
 │   │   ├── images/               # 🌟 封面图片
 │   │   ├── icons/                # RemixIcon 的部分图标（用于 Shadow DOM）
 │   │   ├── avatar.avif           # 🌟 站点所有者头像
-│   ├── components/               # Astro / Svelte 组件
+│   ├── components/               # Astro / SolidJS 组件
 │   ├── content/                  # 不属于内容集合的内容
 │   │   ├── friend-rules.md       # 🌟 友链规则
 │   ├── i18n/                     # i18n 系统
@@ -92,6 +93,8 @@ astro-blog-shokax
 
 ## ⚙️ HyC 能力
 
+> ⚠️ **临时移除** —— `@hyacine/*` 与 `nyx-player` 依赖已从 `package.json` 移除（上游重构中）。以下内容描述预期的集成方式，依赖恢复后即恢复生效。
+
 ShokaX 内置 @hyacine/cli 和 @hyacine/core 提供如下能力：
 
 - AI 推荐和总结
@@ -100,8 +103,8 @@ ShokaX 内置 @hyacine/cli 和 @hyacine/core 提供如下能力：
 - 博客扩展插件
 
 ```shell
-# 建议全局安装，或者后续也可使用 bun hyc 而非 hyc
-bun add @hyacine/cli -g
+# 建议全局安装（或在本地 pnpm add -D @hyacine/cli 后使用 pnpm hyc）
+pnpm add -g @hyacine/cli
 
 hyc sync # 同步数据库和内容集合
 
@@ -128,6 +131,15 @@ hyc serve
 我们使用 [LHCI](https://github.com/GoogleChrome/lighthouse-ci) 测试页面性能，每次提交下都有测试结果。我们对页面性能的最低要求为 Lighthouse 桌面 Performance 92+，实际表现在 98-100 之间：
 
 <img width="1702" height="952" alt="lighthouse" src="https://github.com/user-attachments/assets/05b8768f-5f04-4204-8f4f-7f2f6f30e102" />
+
+## ⚠️ 架构约束
+
+以下耦合点与版本锁定，在重大升级前应重新评估：
+
+- **自定义 Markdown 管线**：`@astrojs/markdown-satteri` + `satteri` 整体替换了 Astro 内置的 Markdown/remark/rehype 处理链（见 `astro.config.mjs` → `markdown.processor`）。这是未来 Astro 大版本升级时最大的耦合点——升级 Astro 前需优先验证该处理链。
+- **版本锁定**：`astro` 精确固定（`7.2.4`）；`pnpm-workspace.yaml` 的 overrides 锁定 `vite@8.1.3` 与 `rolldown@1.1.4`。这些锁定仍因 Windows 构建稳定性保留（rolldown 新版本在 Windows 虚拟模块场景会崩溃）；依赖升级时应重新评估锁定是否仍必要。
+- **休眠集成**：`@hyacine/astro@0.0.3` 因与 Astro 7 不兼容被停用（见 `astro.config.mjs` 注释），但在上游修复或自研替代完成前保留在依赖中。不要未经测试就重新启用。
+- **加密文章**：AES-256-GCM + PBKDF2（600k 迭代，OWASP 2023 推荐阈值）。密文/salt/iv 随页面 HTML 下发，离线暴力破解始终可行——请使用强密码。加密文章已从 RSS 与 sitemap 中排除。
 
 ## 📦 版本控制
 
@@ -249,7 +261,7 @@ ShokaX 开发组向所有 ShokaX 在过去、现在和未来的使用过与可�
 
 - [Astro](https://astro.build/)：本项目的基石
 - [UnoCSS](https://unocss.dev/)：现代化的原子 CSS 引擎，彻底解决了在前作中困扰开发组很长时间的图标问题
-- [Svelte](https://svelte.dev/)：本项目的前端 UI 框架，个人博客项目的理想之选
+- [SolidJS](https://www.solidjs.com/)：本项目的前端 UI 框架（JSX + signals）
 - [Mizuki](https://github.com/matsuzaka-yuki/Mizuki)：直接启发了开发组进行 Astro 迁移，为我们的迁移提供了极好的榜样
-- [Bun](https://bun.sh/)：本项目使用的运行时，高性能而易用
+- [Node.js](https://nodejs.org/)：本项目使用的运行时
 - [Shoka](https://github.com/amehime/hexo-theme-shoka)：ShokaX 的起源，没有 Shoka 便不可能有 ShokaX
