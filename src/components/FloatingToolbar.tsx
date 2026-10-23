@@ -28,8 +28,14 @@ function FloatingToolbar() {
 
   const updateDomPlugins = () => {
     setHasComments(Boolean(document.querySelector("#comments")));
+    // NyxPlayer 插件的水合岛在 SSR 时就存在，播放器面板本身要点击后才挂到 body，
+    // 因此这里同时检测 astro-island，避免“检测不到播放器 → 不给按钮 → 永远打不开”的死循环。
     setHasNyxPlayer(
-      Boolean(document.querySelector("#nyx-player, .nyx-player, nyx-player, [data-nyx-player]")),
+      Boolean(
+        document.querySelector(
+          '#nyx-player, .nyx-player, nyx-player, [data-nyx-player], astro-island[component-url*="NyxPlayer"]',
+        ),
+      ),
     );
   };
 

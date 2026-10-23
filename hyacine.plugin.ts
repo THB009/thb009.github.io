@@ -71,7 +71,7 @@ export default defineConfig({
       restoreDelay: 3000,
     }),
     nyxPlayer({
-      enable: false,
+      enable: true,
       urls: [
         {
           name: "默认歌单",
