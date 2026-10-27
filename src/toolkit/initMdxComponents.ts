@@ -54,6 +54,19 @@ const markSingleOrMulti = (quizItem: QuizItem) => {
   revealAnswer(quizItem);
 };
 
+/**
+ * 收起答案时把选项状态一并清空。
+ * 只移除 show 类的话，right/wrong 与 ✓/✗ 图标会留在选项上，看起来像“没隐藏”。
+ */
+const clearOptionMarks = (quizItem: QuizItem) => {
+  const options = quizItem.querySelectorAll<HTMLElement>(":scope .quiz-options > .quiz-option");
+
+  options.forEach((option) => {
+    option.classList.remove("right", "wrong", "selected");
+    option.querySelector(":scope > .quiz-result-icon")?.remove();
+  });
+};
+
 const bindQuizItem = (quizItem: QuizItem) => {
   if (quizItem.dataset[QUIZ_DATA_BOUND_KEY] === "true") {
     return;
@@ -150,11 +163,21 @@ const bindQuizItem = (quizItem: QuizItem) => {
       });
     });
 
-    actionButton?.addEventListener("click", () => {
-      const willShow = !quizItem.classList.contains("show");
-      quizItem.classList.toggle("show", willShow);
-      actionButton.textContent = willShow ? "隐藏答案" : "显示答案";
-    });
+    if (actionButton) {
+      const button = actionButton;
+
+      button.addEventListener("click", () => {
+        if (quizItem.classList.contains("show")) {
+          quizItem.classList.remove("show");
+          clearOptionMarks(quizItem);
+          button.textContent = "显示答案";
+          return;
+        }
+
+        markSingleOrMulti(quizItem);
+        button.textContent = "隐藏答案";
+      });
+    }
   }
 
   if (quizType === "multi") {
@@ -179,6 +202,7 @@ const bindQuizItem = (quizItem: QuizItem) => {
       const shouldHide = quizItem.classList.contains("show");
       if (shouldHide) {
         quizItem.classList.remove("show");
+        clearOptionMarks(quizItem);
         actionButton.textContent = "查看答案";
         return;
       }
