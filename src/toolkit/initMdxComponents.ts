@@ -82,26 +82,46 @@ const bindQuizItem = (quizItem: QuizItem) => {
       }
     }
 
-    if (quizType === "fill") {
-      quizItem.addEventListener("click", () => {
-        const willShow = !quizItem.classList.contains("show");
-        quizItem.classList.toggle("show", willShow);
-
-        if (willShow) {
-          const gaps = quizItem.querySelectorAll<HTMLElement>(":scope .quiz-gap");
-          gaps.forEach((gap) => {
-            gap.textContent = gap.dataset.answer || "";
-          });
-        }
+    const revealGapAnswers = () => {
+      const gaps = quizItem.querySelectorAll<HTMLElement>(":scope .quiz-gap");
+      gaps.forEach((gap) => {
+        gap.textContent = gap.dataset.answer || "";
       });
+    };
+
+    const toggleAnswer = (): boolean => {
+      const willShow = !quizItem.classList.contains("show");
+      quizItem.classList.toggle("show", willShow);
+
+      if (willShow && quizType === "fill") {
+        revealGapAnswers();
+      }
+
+      return willShow;
+    };
+
+    let actionButton = quizItem.querySelector<HTMLButtonElement>(":scope > .quiz-check-btn");
+    if (!actionButton) {
+      actionButton = document.createElement("button");
+      actionButton.type = "button";
+      actionButton.className = "quiz-check-btn";
+      actionButton.textContent = "查看答案";
+      quizItem.append(actionButton);
     }
 
-    if (quizType !== "fill") {
-      firstQuestionParagraph?.addEventListener("click", () => {
-        const willShow = !quizItem.classList.contains("show");
-        quizItem.classList.toggle("show", willShow);
-      });
-    }
+    const button = actionButton;
+    const syncButtonLabel = (shown: boolean) => {
+      button.textContent = shown ? "隐藏答案" : "查看答案";
+    };
+
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      syncButtonLabel(toggleAnswer());
+    });
+
+    firstQuestionParagraph?.addEventListener("click", () => {
+      syncButtonLabel(toggleAnswer());
+    });
   }
 
   if (quizType === "single") {

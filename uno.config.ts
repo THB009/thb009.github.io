@@ -58,6 +58,10 @@ const iconSafeList = [
   // 外链标识图标：由 wrapExternalLinks 在构建时动态注入 HTML，
   // UnoCSS 静态扫描源文件无法发现，需显式 safelist
   "i-ri-external-link-line",
+  // Quiz 结果图标：由 initMdxComponents 在浏览器运行时按答题结果动态插入，
+  // 同样无法被静态扫描发现；漏掉会导致点击后只隐藏题号、看不到 ✓/✗
+  "i-ri-check-fill",
+  "i-ri-close-fill",
 ].map(normalizeIconName);
 
 export default defineConfig({
