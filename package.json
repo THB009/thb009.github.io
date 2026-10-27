@@ -3,8 +3,8 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build:site": "astro build",
+    "dev": "node scripts/ensure-font-split.mjs && astro dev",
+    "build:site": "node scripts/ensure-font-split.mjs && astro build",
     "build:index": "pagefind --site ./dist",
     "build": "pnpm run build:site && pnpm run build:index",
     "preview": "astro preview",
